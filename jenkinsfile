@@ -4,8 +4,17 @@ pipeline {
         stage('Install k6') {
             steps {
                 script {
-                    // Verifica si k6 está instalado, si no, instálalo
-                    sh 'k6 version || echo "k6 not installed, installing..." && sudo apt-get install k6'
+                    // Verificar si k6 está instalado en Windows, si no, instalarlo
+                    bat '''
+                    if not exist "%ProgramFiles%\\k6\\k6.exe" (
+                        echo "k6 no está instalado, instalando..."
+                        curl -Lo k6-installer.msi https://github.com/grafana/k6/releases/download/v0.46.0/k6-v0.46.0-windows-amd64.msi
+                        msiexec /i k6-installer.msi /quiet
+                        del k6-installer.msi
+                    ) else (
+                        echo "k6 ya está instalado"
+                    )
+                    '''
                 }
             }
         }
@@ -13,14 +22,14 @@ pipeline {
             steps {
                 script {
                     // Ejecutar el script de k6
-                    sh 'k6 run k6-test.js'
+                    bat 'k6 run k6-test.js'
                 }
             }
         }
     }
     post {
         always {
-            // Siempre limpiar después del tests
+            // Siempre limpiar después de los tests
             echo 'Cleaning up...'
         }
         success {
