@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     // Ejecutar el script de k6
-                    sh 'k6 run k6-test.js'
+                    sh 'k6 run .\scripts\k6-test.js'
                 }
             }
         }
