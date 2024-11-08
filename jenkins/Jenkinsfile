@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+    stages {
+        stage('Install k6') {
+            steps {
+                script {
+                    // Verifica si k6 está instalado, si no, instálalo
+                    sh 'k6 version || echo "k6 not installed, installing..." && sudo apt-get install k6'
+                }
+            }
+        }
+        stage('Run k6 Test') {
+            steps {
+                script {
+                    // Ejecutar el script de k6
+                    sh 'k6 run "./scripts/load_test.js"'
+                }
+            }
+        }
+    }
+    post {
+        always {
+            // Siempre limpiar después del tests
+            echo 'Cleaning up...'
+        }
+        success {
+            // Notificar en caso de éxito
+            echo 'Test completed successfully!'
+        }
+        failure {
+            // Notificar en caso de fallo
+            echo 'Test failed!'
+        }
+    }
+}
